@@ -7,11 +7,13 @@
             </div>
         </div>
         <div class="project-lt">
-            <Guide direction="left" :isStart="isStart" @guideClick="guideClick" ></Guide>
+            <Guide direction="left" :isStart="isStart" @guideClick="guideClick"></Guide>
         </div>
         <div class="project-rt">
-            <Guide direction="right" :isEnd="isEnd" @guideClick="guideClick" ></Guide>
+            <Guide direction="right" :isEnd="isEnd" @guideClick="guideClick"></Guide>
+            <el-button type="primary" size="mini" @click="exportExcel">导出excel</el-button>
         </div>
+        
     </div>
     <el-table
         :data="level2Project"
@@ -64,6 +66,8 @@
     import API from '../../api/api.js'
     import Guide from '../../common/guide.vue'
     import projectMixin from '../../common/projectMixin.vue'
+    import exportXlsx from '../../common/exportXlsx.js'
+    import {Message} from 'element-ui'
     export default {
         data () {
             return {
@@ -90,6 +94,14 @@
                             trgger: 'blur'
                         }
                     ]
+                },
+                header: {
+                    name: '产品名',
+                    count: '结余',
+                    id: '批号',
+                    endTime: '过期时间',
+                    price: '入库价',
+                    oneName: '一级分类名'
                 }
             }
         },
@@ -128,7 +140,16 @@
                         })                    
                 }
                 
-            }    
+            },
+            exportExcel() {
+                
+                let flag = this.level2Project.length;
+                if(flag) {                
+                    exportXlsx(data, this.header);
+                }else {
+                    Message('数据为空')
+                }
+            }   
         },
         watch: {
             inFlag(newVal) {

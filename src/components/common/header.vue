@@ -24,6 +24,8 @@
             localStorage.removeItem('brandName');
             localStorage.removeItem('userId');
             localStorage.removeItem('technicianDetails')
+            localStorage.removeItem('storeName')
+            localStorage.removeItem('isShowPerformance')
             this.$router.replace('/login/store');
         }
     }

@@ -60,6 +60,13 @@
                     <el-form-item label="学历" prop="grad">
                         <el-input v-model="technicianFormData.grad"></el-input>
                     </el-form-item>
+                    <el-form-item label="入职日期" prop="inTime">
+                        <el-date-picker
+                            v-model="technicianFormData.inTime"
+                            type="date"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                    </el-form-item>                    
                 </el-form>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="technicianAddFlag = false">取 消</el-button>
@@ -81,7 +88,8 @@
                 name: '',
                 phone: '',
                 level: '',
-                grad: ''
+                grad: '',
+                inTime: ''
             },
             technicianFormDataRules: {
                 name: [
@@ -121,6 +129,19 @@
                         trigger: 'blur'
                     }
                 ],
+                inTime: [
+                    {
+                        required: true,
+                        validator: (value, rule, callback) => {
+                            if(!value) {
+                                callback(new Error('请选择出生日期'));
+                            }else {
+                                callback();
+                            }                            
+                        },
+                        trigger: 'blur'                       
+                    }
+                ]
             }
         }
     },
@@ -134,16 +155,16 @@
                 let params = Object.assign({
                     storeId: this.storeId
                 }, this.technicianFormData)
+                params.inTime = params.inTime.toUTCString();
                 API.fetch('/api/administration/technicians/add', params)
                     .then((data) => {
                         this.getList();
                         Message('添加成功');
                         this.technicianAddFlag = false;
-                        this.reset();
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         Message('添加失败')
-                    })          
+                    })
             }
         },
         goToTechnicianDetails(detail) {// 跳到详情页

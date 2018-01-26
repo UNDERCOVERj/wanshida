@@ -3,7 +3,7 @@
     <div class="project">
         <div class="banner">
             <div class="project-level-1">
-                <div class="project-card" v-for="(card,index) in computedCards" @click="showLevel2Project(index)" :class="{'project-card-active': index == computedLevel1ProjectIndex}">{{card.projectName}}</div>
+                <div @dblclick="modifyLevel1Project(card)" class="project-card" v-for="(card,index) in computedCards" @click="showLevel2Project(index)" :class="{'project-card-active': index == computedLevel1ProjectIndex}">{{card.projectName}}</div>
             </div>
             <div class="project-lt">
                 <Guide direction="left" @guideClick="guideClick" :isStart="isStart"></Guide>
@@ -84,6 +84,21 @@
                 <el-button type="primary" @click="addLevel2Project">确认添加</el-button>
             </span>
         </el-dialog>
+        <el-dialog
+            title="修改一级项目"
+            :visible.sync="modifyLevel1ProjectFlag"
+            width="40%"
+            center>
+            <el-form label-position="right" label-width="10em" :model="modifyLevel1ProjectData" :rules="modifyLevel1ProjectDataRules" ref="modifyLevel1ProjectData">
+                <el-form-item label="一级项目名" prop="name">
+                    <el-input v-model="modifyLevel1ProjectData.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="modifyLevel1ProjectFlag = false">取 消</el-button>
+                <el-button type="primary" @click="modifyLevel1ProjectSubmit">确认修改</el-button>
+            </span>
+        </el-dialog>        
     </div>
 </template>
 <script>
@@ -93,6 +108,20 @@
     export default {
         data() {
             return {
+                modifyLevel1ProjectFlag: false,
+                modifyLevel1ProjectData: {
+                    name: ''
+                },
+                modifyLevel1ProjectDataRules: {
+                    name: [
+                        {
+                            required: true,
+                            trigger: 'blur',
+                            message: '项目名不能为空'
+                        }
+                    ]
+                        
+                },
                 projectListUrl: '/api/administration/project/list',
                 projectTwoListUrl: '/api/administration/project/two/list',
                 type: 'store',
@@ -186,10 +215,54 @@
                         Message('删除成功');
                         this.$store.commit('resetSelections')
                     })
+            },
+            modifyLevel1Project (card) {
+                this.modifyLevel1ProjectData.name = card.projectName;
+                this.modifyLevel1ProjectData.projectId = card.projectId;
+                this.modifyLevel1ProjectFlag = true;
+            },
+            modifyLevel1ProjectSubmit() {
+                let flag;
+                this.$refs.modifyLevel1ProjectData.validate((valid) => {
+                    flag = valid;
+                })
+                if (flag) {
+                    let params = {
+                        name: this.modifyLevel1ProjectData.name,
+                        projectId: this.modifyLevel1ProjectData.projectId,
+                        storeId: this.storeId
+                    }
+                    API.fetch('/api/administration/project/one/update', params)
+                        .then((data) => {
+                            this.getFirstList(this.projectListUrl, 'projectOnePojoList', 'projectTwoPojoList')
+                            this.modifyLevel1ProjectFlag = false;
+                            Message('修改成功');
+                        })
+                        .catch(() => {
+                            Message('修改失败')
+                        })
+                }
             }
         },
         mounted() {
             this.getFirstList(this.projectListUrl, 'projectOnePojoList', 'projectTwoPojoList')
+        },
+        watch: {
+            level2ProjectFlag (newVal) {
+                if(!newVal) {
+                    this.$refs.level2ProjectFormData.resetFields();
+                }
+            },
+            level1ProjectFlag (newVal) {
+                if(!newVal) {
+                    this.$refs.level1ProjectFormData.resetFields();
+                }
+            },
+            modifyLevel1ProjectFlag (newVal) {
+                if(!newVal) {
+                    this.$refs.modifyLevel1ProjectData.resetFields();
+                }
+            }
         }
     }
 </script>

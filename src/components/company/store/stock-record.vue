@@ -103,9 +103,10 @@
             },
             exportExcel() {
                 let flag = this.rangeDate.length;
-                console.log(flag)
                 if(flag) {
-                    //exportXlsx(this.recordData, this.header);
+                    exportXlsx(this.recordData, this.header);
+                }else {
+                    Message('数据为空')
                 }
             }
         },

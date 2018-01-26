@@ -5,7 +5,7 @@
       <span class="store-item-block">
         {{store.name}}
       </span>
-      <el-button type="primary" size="mini" class="store-item-block" @click="goToStorePerformance(store)">门店业绩</el-button>
+      <el-button type="primary" size="mini" class="store-item-block" @click="goToStorePerformance(store)" v-if="isShowPerformance != 2">门店业绩</el-button>
       <el-button type="primary" size="mini" class="store-item-block" @click="goToStoreIndex(store)">门店库存</el-button>
     </div>
   </div>
@@ -39,6 +39,7 @@
         },
         mounted() {
             this.companyId = localStorage.getItem('companyId');
+            this.isShowPerformance = localStorage.getItem('isShowPerformance')
             this.getList();
         }
     }

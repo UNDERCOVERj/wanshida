@@ -2,7 +2,7 @@
   <div class="login">
     <div class="login-brand">
         <img :src="require('../../static/brand.jpg')" alt="brand">
-        <h2>省万事产后调理中心门店管理系统</h2>
+        <h2>伊美荟产后调理中心门店管理系统</h2>
     </div>
     <div class="clearfix">
       <router-link :to="{path: '/login/store'}" tag="p" class="login-btn">门店登陆</router-link>
@@ -33,7 +33,7 @@
       </el-form>
       <div class="login-ft">
         <el-button type="primary" style="width: 100px" :disabled="!shouldSubmit" @click="submit">登陆</el-button>
-        <h3>勤奋积累流水，管理创业利润！</h3>
+        <h3>勤奋积累流水，管理创造利润！</h3>
       </div>
     </div>
 
@@ -122,11 +122,10 @@ export default {
                       if(params.type == 1) {
                         localStorage.setItem('storeId', info.userId);
                         localStorage.removeItem('companyId');
-                        //this.$store.commit('setStoreId', info.userId);
                       }else if(params.type == 2) {
                         localStorage.setItem('companyId', info.userId);
+                        localStorage.setItem('isShowPerformance', info.level)
                         localStorage.removeItem("storeId");
-                        //this.$store.commit('setCompanyId', params.userId);                        
                       }
                       localStorage.setItem('brandName', info.brandName);
                       this.$router.push({path: info.path});

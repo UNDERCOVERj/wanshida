@@ -93,17 +93,19 @@
                     }
 
                     API.fetch('/api/administration/stock/detail/out/in', params)
-                      .then((data) => {
-                          this.recordData = data;
-                      })                     
+                        .then((data) => {
+                            this.recordData = data;
+                            if(!this.recordData.length) {
+                                Message('数据为空')
+                            }
+                        })                     
                 }else {
                     Message('请选择日期')
                 }
                        
             },
             exportExcel() {
-                let flag = this.rangeDate.length;
-                console.log(flag)
+                let flag = this.recordData.length;
                 if(flag) {
                     exportXlsx(this.recordData, this.header);
                 }else {

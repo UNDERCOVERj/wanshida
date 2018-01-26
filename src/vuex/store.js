@@ -104,8 +104,7 @@ export default {
             let loadingTimer = setTimeout(() => {
               loading.close();
               Message('加载项目失败');
-            }, 5000);            
-            console.log('djdjdj')
+            }, 5000);
             API.fetch('/api/administration/project/two/list', data.params)
               .then((data) => {
                 balance.children = data.map((item) => {

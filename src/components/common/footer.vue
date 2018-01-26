@@ -1,6 +1,6 @@
 <template>
     <div class="footer">
-        <span>@copyright 省万事</span>
+        <span>@copyright 伊美荟</span>
     </div>
 </template>
 <script>

@@ -22,10 +22,14 @@
                 align="center"
                 prop="name"
                 label="姓名">
-                <template slot-scope="scope">
-                    <el-badge :value="7" :max="99" class="item">
-                        {{scope.row.name}}
-                    </el-badge>
+                <template slot-scope="scope" >
+                    <div>
+                        <el-badge :value="7" :max="99" class="item" v-if="scope.row.consumptionFalg == 1">
+                            {{scope.row.name}}
+                        </el-badge>
+                        <span v-if="scope.row.consumptionFalg == 0">{{scope.row.name}}</span>                        
+                    </div>
+                    
                 </template>
             </el-table-column>
             <el-table-column
@@ -39,7 +43,10 @@
                 prop="birthday"
                 label="出生日期">
                 <template slot-scope="scope">
-                    <el-badge is-dot>{{scope.row.birthday}}</el-badge>
+                    <div>
+                        <el-badge is-dot v-if="scope.row.birthdayFlag == 1">{{scope.row.birthday}}</el-badge>
+                        <span v-if="scope.row.birthdayFlag == 0">{{scope.row.birthday}}</span>
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column
@@ -95,7 +102,7 @@
                         <el-radio label="女">女</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="宝宝出生日期" prop="babyBirthday">
+                <el-form-item label="宝宝出生日期">
                     <el-date-picker
                         v-model="clientAdd.babyBirthday"
                         type="date"
@@ -158,13 +165,6 @@
                     validator: checkBirthday,
                     trigger: 'blur'
                 }
-            ],
-            babyBirthday: [
-                {
-                    required: true,
-                    validator: checkBirthday,
-                    trigger: 'blur'
-                }
             ]
         }
         return {
@@ -214,7 +214,7 @@
                     this.total = this.count = data.count;//多少页不管
                 })
                 .catch((err) => {
-                    console.log(err)
+                    Message('出错')
                 })
         },
         doSearch() {
@@ -244,10 +244,15 @@
                 flag = valid
             })
             let params = Object.assign({}, this.clientAdd);
+            if(!params.babyBirthday) {
+                delete params.babyBirthday
+            }else {
+                params.babyBirthday = params.babyBirthday.toUTCString();
+            }
             params.storeId = localStorage.getItem('storeId');
             if(flag) {
                 params.birthday = params.birthday.toUTCString();
-                params.babyBirthday = params.babyBirthday.toUTCString();          
+                          
                 Api.fetch('/api/administration/customer/add', params)
                     .then((data) => {
                         Message('添加成功');
@@ -262,6 +267,7 @@
         clientAddFlag(newVal) {
             if(!newVal) {
                 this.$refs['clientAdd'].resetFields();
+                this.clientAdd.babyBirthday = ''
             }
         }
     },

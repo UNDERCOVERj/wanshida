@@ -27,8 +27,8 @@ import {Message} from 'element-ui'
 // }
 axios.defaults.timeout = 600000;                        //响应时间
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';           //配置请求头
-//axios.defaults.baseURL = 'http://120.78.94.110:8080/eric';   //配置接口地址
-axios.defaults.baseURL = '';
+axios.defaults.baseURL = 'http://120.78.94.110:8080/eric';   //配置接口地址
+//axios.defaults.baseURL = '';
 //POST传参序列化(添加请求拦截器)
 axios.interceptors.request.use((config) => {
     //在发送请求之前做某件事
@@ -53,7 +53,7 @@ axios.interceptors.response.use((res) =>{
 });
 //返回一个Promise(发送post请求)
 export default function fetch(url, params) {
-    //url = url.replace('/api', '');
+    url = url.replace('/api', '');
     return new Promise((resolve, reject) => {
         axios.post(url, params)
             .then(response => {

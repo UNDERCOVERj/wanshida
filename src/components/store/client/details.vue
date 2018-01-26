@@ -19,6 +19,10 @@
                         <span>生日：</span>
                         <span class="info-text">{{basicInfo.birthday | filterBirthday}}</span>
                     </li>
+                    <li>
+                        <span>宝宝出生日期：</span>
+                        <span class="info-text">{{basicInfo.babyBirthday | filterBirthday}}</span>
+                    </li>                    
                 </ul>
                 <ul>
                     <li>
@@ -39,6 +43,7 @@
                         <span>积分余额：</span>
                         <span class="info-text">{{basicInfo.balance}}</span>
                         <el-button type="primary" style="margin-left: 2em" @click="balanceFlag = true">积分使用</el-button>
+                        <el-button type="primary" style="margin-left: 2em" @click="modifyFlag = true">修改资料</el-button>
                     </p>
                 </div>
             </div>
@@ -49,14 +54,16 @@
             <div class="time-card">
                 <Guide direction="left" @guideClick="guideClick" :isStart="isTimeStart"></Guide>
                 <div class="time-card-content">
-                <div class="time-card-item" v-for="(timeCard, cardIndex) in computedTimeCards">
-                    <p>{{timeCard.cardName}}</p>
-                    <p>进度：{{timeCard.status != 2 ? timeCard.progress + '/' + timeCard.limit : '结束'}}</p>
-                    <p v-if="timeCard.status != 2">
-                        <el-button size="mini" type="primary" @click="showVerify(timeCard, 1)">核销</el-button>
-                        <el-button size="mini" type="primary" @click="showVerifyManage(timeCard)">管理</el-button>
-                    </p>
-                </div>
+                    <div class="time-card-item" v-for="(timeCard, cardIndex) in computedTimeCards">
+                        <p class="details-close" @click="close(timeCard, 1)">X</p>
+                        <p>{{timeCard.cardName}}</p>
+                        <!-- 0 正常 1 结束 2 冻结 -->
+                        <p>进度：{{timeCard.status == 0 ? timeCard.progress + '/' + timeCard.limit : timeCard.status == 1 ? '结束' : '冻结'}}</p>
+                        <p >
+                            <el-button v-if="timeCard.status == 0 || timeCard.status == 1" size="mini" type="primary" @click="showVerify(timeCard, 1)">核销</el-button>
+                            <el-button v-if="timeCard.status == 0 ||timeCard.status == 2" size="mini" type="primary" @click="showVerifyManage(timeCard)">管理</el-button>
+                        </p>
+                    </div>
                 </div>
                 <Guide direction="right" @guideClick="guideClick" :isEnd="isTimeEnd"></Guide>
             </div>
@@ -69,9 +76,10 @@
                     <Guide direction="left" @guideClick="guideClick2" :isStart="isTreatStart"></Guide>
                     <div class="treat-card-content">
                         <div class="treat-card-item" v-for="treatCard in computedTreatCards">
+                            <p class="details-close" @click="close(treatCard, 2)">X</p>
                             <p>{{treatCard.cardName}}</p>
-                            <p>进度：{{treatCard.progress}}/{{treatCard.limit}}</p>
-                            <p>
+                            <p>进度：{{treatCard.status == 0 ? treatCard.progress + '/' + treatCard.limit : treatCard.status == 1 ? '结束' : '冻结'}}</p>
+                            <p v-if="treatCard.status == 0">
                                 <el-button size="mini" type="primary" @click="showVerify(treatCard, 2)">核销</el-button>
                             </p>
                         </div>
@@ -100,13 +108,18 @@
                     <el-table-column
                         align="center"
                         prop="time"
-                        label="核销时间">
+                        label="时间">
                     </el-table-column>
                     <el-table-column
                         align="center"
                         prop="progressStr"
                         label="消费进度">
                     </el-table-column>
+                    <el-table-column
+                        align="center"
+                        prop="reason"
+                        label="操作">
+                    </el-table-column>                    
                 </el-table>
             </div>
             <div class="integral">
@@ -164,7 +177,7 @@
             </p>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="consumptionSubmit(1)">提交</el-button>
-                <el-button type="primary" @click="consumptionSubmit(2)">核销成功</el-button>
+                <el-button type="primary" @click="consumptionSubmit(2)" :disabled="isConsumptionSubmit">核销成功</el-button>
             </span>
         </el-dialog>
         <el-dialog
@@ -228,9 +241,61 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="balanceSubmit(1)">提交</el-button>
-                <el-button type="primary" @click="balanceSubmit(2)">确认成功</el-button>
+                <el-button type="primary" @click="balanceSubmit(2)" :disabled="isBalanceSubmit">确认成功</el-button>
             </span>
-        </el-dialog>    
+        </el-dialog>
+        <el-dialog
+        title="资料修改"
+        :visible.sync="modifyFlag"
+        width="40%"
+        center>
+        <el-form label-position="right" label-width="120px" :model="modifyDetails">
+            <el-form-item label="姓名">
+                <el-input v-model="modifyDetails.name"></el-input>
+            </el-form-item>            
+            <el-form-item label="手机号">
+                <el-input v-model="modifyDetails.phoneNumber"></el-input>
+            </el-form-item> 
+            <el-form-item label="生日">
+                <el-date-picker
+                    v-model="modifyDetails.birthday"
+                    placeholder="请选择日期">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="宝宝出生日期">
+                <el-date-picker
+                    v-model="modifyDetails.babyBirthday"
+                    placeholder="请选择日期">
+                </el-date-picker>
+            </el-form-item>            
+            <el-form-item label="地址">
+                <el-input v-model="modifyDetails.address"></el-input>
+            </el-form-item> 
+            <el-form-item label="性别">
+                <el-input v-model="modifyDetails.sex"></el-input>
+            </el-form-item>                  
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="modify">确认</el-button>
+        </span>
+    </el-dialog> 
+    <el-dialog
+        title="退卡"
+        :visible.sync="closeFlag"
+        v-loading="true"
+        width="40%"
+        class="balance-use"
+        center>
+        <el-form :model="closeFormData" label-width="8em" :rules="closeFormDataRules" ref="closeFormData">
+            <el-form-item label="退卡金额:" prop="price">
+                <el-input v-model="closeFormData.price"></el-input>       
+            </el-form-item>                 
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="closeFlag = false">取消</el-button>
+            <el-button type="primary" @click="closeSubmit">确认</el-button>
+        </span>
+    </el-dialog>                        
     </div>
 </template>
 <script>
@@ -284,7 +349,35 @@
                 formData: {// 积分使用
                     balanceSelectedSelection: [],// 选定的项目
                     point: ''
-                }
+                },
+                isBalanceSubmit: true,
+                isConsumptionSubmit: true,
+                modifyFlag: false,
+                modifyDetails: {},
+                closeFlag: false,
+                closeFormData: {
+                    price: ''
+                },
+                closeFormDataRules: {
+                    price: [
+                        {
+                            required: true,
+                            validator: (rule, value, callback) => {
+                                let reg = /^\d+$/;
+                                if(!value.trim()) {
+                                    callback(new Error('价格不能为空'));
+                                }else if(!reg.test(+value)) {
+                                    callback(new Error('价格应为整数'));
+                                }else {
+                                    callback();
+                                }
+                            },
+                            trigger: 'blur'
+                        }
+                    ]
+                },
+                closeCard: {},
+                closeType: 1
             }
         },
         methods: {
@@ -316,12 +409,12 @@
                 API.fetch('/api/administration/project/settlement', params)
                     .then((data) => {
                         if(status == 2) {//核销成功
-                          this.verifyFlag = false;
-                          Message('核销成功');
+                            this.verifyFlag = false;
+                            Message('核销成功');
                         }else if(status == 1) {
-                          Message('提交成功');
+                            Message('提交成功');
+                            this.isConsumptionSubmit = false;
                         }   
-
                     })
                     .catch(() => {
                         Message('确认消费失败')
@@ -345,6 +438,7 @@
                         .then((data) => {
                             if(status == 1) {
                                 Message('提交成功');
+                                this.isBalanceSubmit = false;
                             }else {
                                 Message('确认成功');
                                 this.balanceFlag = false;
@@ -380,6 +474,7 @@
                         this.manageFlag = false;
                         let text = type == 1 ? '停卡成功' : '复卡成功';
                         Message(text);
+                        this.initInfo();
                     })
             },
             initInfo() {//客户管理界面详情
@@ -390,6 +485,7 @@
                 API.fetch('/api/administration/customer/info', params)
                     .then((data) => {
                         this.basicInfo = data.userInfo;
+                        this.modifyDetails = Object.assign({}, data.userInfo);
                         this.timeCards = data.timeCardList;
                         this.treatCards = data.frequencyCardList;
                         [].forEach.call(data.consumptionDetailList, (item) => {
@@ -412,7 +508,72 @@
                     value: value,
                     vue: this
                 })
-            } 
+            },
+            modify() {
+                let params = this.modifyDetails;
+                if(params.birthday) {
+                    params.birthday = new Date(params.birthday).toUTCString();
+                    if(params.babyBirthday) {
+                        params.babyBirthday = new Date(params.babyBirthday).toUTCString();
+                    }else {
+                        delete params.babyBirthday;
+                    }
+                    params.storeId = this.storeId;
+                    params.userId = this.userId;
+                    params.phone = params.phoneNumber;
+                    delete params.balance
+                    delete params.phoneNumber;
+                    delete params.age
+                    API.fetch('/api/administration/customer/update/info', params)
+                        .then((data) => {
+                            Message('修改成功');
+                            this.initInfo();
+                            this.modifyFlag = false;
+                        })
+                }else {
+                    Message('请选择日期');
+                }
+                
+            },
+            close(card, type) {
+                this.closeCard = card;
+                this.closeType = type;
+                this.closeFlag = true;
+            },
+            closeSubmit() {
+                let flag;
+                this.$refs.closeFormData.validate((valid) => {
+                    flag = valid
+                })
+                if(flag) {
+                    let params = {
+                        storeId: this.storeId,
+                        userId: this.userId,
+                        cardId: this.closeCard.cardId,
+                        type: this.closeType,
+                        price: this.closeFormData.price
+                    }
+                    API.fetch("/api/administration/card/out", params)
+                        .then((data) => {
+                            Message('退卡成功')
+                        })
+                        .catch(() => {
+                            Message("退卡失败")
+                        })                                        
+                }
+                
+            }
+        },
+        filters: {
+            filterBirthday(val) {
+                let str;
+                if(val) {
+                    str = new String(val).split(' ')[0];
+                }else {
+                    str = '';
+                }
+                return str
+            }
         },
         computed: {
             ...mapGetters([
@@ -422,13 +583,17 @@
                 return this.curTimeCardPage  === 1;
             },
             isTimeEnd() {
-                return this.curTimeCardPage === Math.ceil(this.timeCards.length/this.cardPageSize);
-            },
+                let num = Math.ceil(this.timeCards.length/this.cardPageSize);
+                num = num == 0 ? 1 : num;
+                return this.curTimeCardPage === num;
+            },            
             isTreatStart() {
                 return this.curTreatCardPage  === 1;
             },
             isTreatEnd() {
-                return this.curTreatCardPage === Math.ceil(this.treatCards.length/this.cardPageSize);
+                let num = Math.ceil(this.treatCards.length/this.cardPageSize);
+                num = num == 0 ? 1 : num;
+                return this.curTreatCardPage === num;
             },
             computedTimeCards() {// 计算过的timecard
                 return this.timeCards.slice((this.curTimeCardPage - 1)*this.cardPageSize, this.curTimeCardPage*this.cardPageSize + 1);
@@ -439,11 +604,6 @@
         },
         components: {
             Guide
-        },
-        filters: {
-            filterBirthday(val) {
-                return new String(val).split(' ')[0]
-            }
         },
         mounted() {
             this.userId = localStorage.getItem('userId');
@@ -461,6 +621,7 @@
                 if(newVal) {
                     this.verifyFormData.technicianArr.splice(1);
                     this.verifyFormData.technicianArr[0] = Object.assign({}, this.initialTechnician);
+                    this.isBalanceSubmit = true;
                 }
             },
             balanceFlag(newVal) {
@@ -472,8 +633,15 @@
                         params: params,
                         vue: this
                     })
+                    this.isConsumptionSubmit = true;
                 }else {
                     this.formData.balanceSelectedSelection = [];
+                    this.$refs.formData.resetFields();
+                }
+            },
+            closeFlag(newVal) {
+                if(!newVal) {
+                    this.closeCard = {};
                 }
             }
         }
@@ -557,5 +725,11 @@
         font-size: 1.5em;
         font-weight: bold;
         cursor: pointer;
+    }
+    .details-close{
+        text-align: right;
+        padding-right: 5px;
+        cursor: pointer;
+        margin: 5px 0 0 0;
     }
 </style>

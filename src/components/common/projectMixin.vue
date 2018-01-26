@@ -58,7 +58,7 @@
 							this.level2Project = data[level2Project];
 					    })
 					    .catch((code) => {
-					        console.log(code)
+					        Message(code)
 					    })
 				}        
 			},
@@ -100,7 +100,9 @@
 				return this.currentLevel1ProjectPage  === 1;
 			},
 			isEnd() {
-				return this.currentLevel1ProjectPage === Math.ceil(this.level1Project.length/this.cardPageSize);
+				let num = Math.ceil(this.level1Project.length/this.cardPageSize);
+				num = num == 0 ? 1 : num;
+				return this.currentLevel1ProjectPage === num;
 			},    
 			computedCards() {// 计算过的timecard
 				this.computedLevel1ProjectIndex = 0;

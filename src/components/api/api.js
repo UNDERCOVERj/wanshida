@@ -11,9 +11,10 @@ let login = (params) => {
 						})						
 					}else if(params.type == 2) {
 						resolve({
-							brandName: data,
+							brandName: data.name,
 							userId: params.userId,
-							path: '/company/account/list'//keng de hen
+							path: '/company/account/list',
+							level: data.level
 						})						
 					}
 				})

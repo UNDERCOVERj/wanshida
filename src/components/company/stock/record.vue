@@ -10,7 +10,7 @@
                 end-placeholder="结束日期">
             </el-date-picker>
             <el-button type="primary" size="mini" @click="doSearch">查询</el-button>
-            <el-button type="primary" size="mini">导出公司出入库记录</el-button>
+            <el-button type="primary" size="mini" @click="exportExcel">导出公司出入库记录</el-button>
         </div>
         <div class="stock-record-list">
             <el-table
@@ -69,11 +69,23 @@
 <script>
     import API from '../../api/api.js'
     import {Message} from 'element-ui'
+    import exportXlsx from '../../common/exportXlsx.js'
     export default {
         data() {
             return {
                 recordRangeDate: [],
-                items: []
+                items: [],
+                header: {
+                    oneName: '一级分类',
+                    twoName: '二级分类',
+                    number: '批号',
+                    operation: '操作',
+                    inPrice: '入库价',
+                    outPrice: '出库价',
+                    count: '数量',
+                    reason: '门店',
+                    time: '时间'
+                }
             }
         },
         methods: {
@@ -93,6 +105,18 @@
                         })            
                 }else {
                     Message('请选择日期')
+                }
+            },
+            exportExcel() {
+                let flag = this.recordRangeDate.length;
+                if(flag) {
+                    let data = [].slice.call(this.items);
+                    data.forEach((item) => {
+                        delete item.storeId;
+                    })
+                    exportXlsx(data, this.header);
+                }else {
+                    Message('请选择日期，数据为空')
                 }
             }
         },
