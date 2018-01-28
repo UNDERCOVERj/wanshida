@@ -7,7 +7,24 @@
     data() {
       return {
         companyName: '伊美荟（上海）健康科技有限公司',
-        navs: [
+        navs: []
+      }
+    },
+    components: {
+      Home
+    },
+    created() {
+      let isShowPerformance = localStorage.getItem('isShowPerformance');
+      if(isShowPerformance == 2) {
+        this.navs = [
+          {
+            name: '库存管理',
+            path: '/company/stock/list',
+            flag: false
+          }
+        ]
+      }else {
+        this.navs = [
           {
             name: '账号管理',
             path: '/company/account/list',
@@ -25,9 +42,6 @@
           }
         ]
       }
-    },
-    components: {
-      Home
     }
   }
 </script>

@@ -10,12 +10,22 @@ let login = (params) => {
 							path: '/store/client/list'
 						})						
 					}else if(params.type == 2) {
-						resolve({
-							brandName: data.name,
-							userId: params.userId,
-							path: '/company/account/list',
-							level: data.level
-						})						
+						if(data.level == 2) {
+							resolve({
+								brandName: data.name,
+								userId: params.userId,
+								path: '/company/stock/list',
+								level: data.level
+							})							
+						}else {
+							resolve({
+								brandName: data.name,
+								userId: params.userId,
+								path: '/company/account/list',
+								level: data.level
+							})							
+						}
+												
 					}
 				})
 				.catch((code) => {
