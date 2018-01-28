@@ -14,8 +14,7 @@
           label="账号"
           prop="username"
           :rules="[
-            { validator: validateUsernameBlur, trigger: 'blur'},
-            { validator: validateUsernameChange, trigger: 'change'}
+            { validator: validate, trigger: 'change'}
           ]"
         >
           <el-input v-model="formData.username" size="small" style="width: 80%"></el-input>
@@ -24,8 +23,7 @@
           label="密码"
           prop="password"
           :rules="[
-            { validator: validatePasswordChange, trigger: 'change'},
-            { validator: validatePasswordBlur, trigger: 'blur'}
+            { validator: validate, trigger: 'change'}
           ]"
         >
           <el-input v-model="formData.password" size="small" type="password" style="width: 80%"></el-input>
@@ -46,30 +44,14 @@ import Api from './api/api.js'
 export default {
   name: 'login',
   data () {
-    let uReg = /^[0-9]+$/;
-    let validateUsernameBlur = (rule, value, callback) => {
-      if(value === '') {
-        callback(new Error('账号不能为空'));
-      }else if(!uReg.test(value)) {
-        callback(new Error('账号格式错误'));
-      }else {
-        callback();
-      }
-    }
-    let validateUsernameChange = (rule, value, callback) => {
-      if(value === '') {
-        callback(new Error('账号不能为空'));
-      }else if(isNaN(value)) {
-        callback(new Error('账号格式错误'));
-      }else {
-        callback();
-      }
-    }
-    let func =  (rule, value, callback) => {
-      if(value === '') {
-        callback(new Error('密码不能为空'));
-      }else {
-        callback();
+    let reg = /^([a-z]|[A-Z]|[0-9]){8}$/;
+    let validate = (rule, value, callback) => {
+      if(!value) {
+          callback(new Error('不能为空'))
+      }else if (!reg.test(value)) {
+          callback(new Error('请输入八位数字加字母'));
+      } else {
+          callback();
       }
     }
     return {
@@ -78,16 +60,13 @@ export default {
         username: '',
         password: ''
       },
-      validateUsernameBlur,
-      validateUsernameChange,
-      validatePasswordBlur: func,
-      validatePasswordChange: func,
-      uReg
+      validate: validate,
+      reg
     }
   },
   computed: {
     shouldSubmit() {// 是否置灰
-      return this.formData.password.length  && this.uReg.test(this.formData.username);
+      return this.formData.password.length  && this.reg.test(this.formData.username);
     }
   },
   created (){

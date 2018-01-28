@@ -214,7 +214,6 @@
                     this.total = this.count = data.count;//多少页不管
                 })
                 .catch((err) => {
-                    Message('出错')
                 })
         },
         doSearch() {
