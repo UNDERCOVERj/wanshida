@@ -176,7 +176,7 @@
                         .then((data) => {
                             this.level1ProjectFlag = false;
                             Message('添加成功');
-                            this.getFirstList('store', this.projectListUrl);
+                            this.getFirstList(this.projectListUrl, 'projectOnePojoList', 'projectTwoPojoList')
                         })
                         .catch(() => {
                             Message('添加失败');
