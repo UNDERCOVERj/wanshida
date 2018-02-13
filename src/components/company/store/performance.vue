@@ -69,7 +69,12 @@
                 align="center"
                 prop="userName"
                 label="客户名">
-            </el-table-column>            
+            </el-table-column>
+            <el-table-column
+                align="center"
+                prop="remarks"
+                label="备注">
+            </el-table-column>                         
         </el-table>
     </div>
   </div>
@@ -95,7 +100,8 @@ export default {
                 reason: '事例',
                 techniciansName: '技师',
                 type: '项目类型',
-                userName: '客户名'
+                userName: '客户名',
+                remarks: '备注'
             }
         }
     },

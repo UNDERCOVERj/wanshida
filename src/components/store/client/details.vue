@@ -119,7 +119,13 @@
                         align="center"
                         prop="reason"
                         label="操作">
-                    </el-table-column>                    
+                    </el-table-column>
+                    <el-table-column
+                        align="center"
+                        prop="remarks"
+                        label="备注"
+                    >  
+                    </el-table-column>                 
                 </el-table>
             </div>
             <div class="integral">
@@ -175,6 +181,10 @@
                 </select>
                 <span class="verify-other" @click="addTechnicianArr">+</span>
             </p>
+            <p class="verify-p">
+                <span class="verify-label">备注：</span>
+                <el-input class="verify-label" v-model="verifyFormData.remarks" type="textarea"></el-input>
+            </p>            
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="consumptionSubmit(1)">提交</el-button>
                 <el-button type="primary" @click="consumptionSubmit(2)" :disabled="isConsumptionSubmit">核销成功</el-button>
@@ -340,7 +350,8 @@
                 verifyFlag: false,
                 initialTechnician: {},
                 verifyFormData: {
-                    technicianArr: [{}]// 展示服务技师有几行
+                    technicianArr: [{}],// 展示服务技师有几行
+                    remarks: ''
                 },
                 technicians: [], // 多少个技师
                 manageFormData: {},
@@ -404,13 +415,15 @@
                     userId: this.userId,
                     storeId: this.storeId,
                     type: data.type,
-                    status: status
+                    status: status,
+                    remarks: data.remarks
                 }
                 API.fetch('/api/administration/project/settlement', params)
                     .then((data) => {
                         if(status == 2) {//核销成功
                             this.verifyFlag = false;
                             Message('核销成功');
+                            this.initInfo();
                         }else if(status == 1) {
                             Message('提交成功');
                             this.isConsumptionSubmit = false;
@@ -621,6 +634,7 @@
                 if(newVal) {
                     this.verifyFormData.technicianArr.splice(1);
                     this.verifyFormData.technicianArr[0] = Object.assign({}, this.initialTechnician);
+                    this.verifyFormData.remarks = '';
                     this.isBalanceSubmit = true;
                 }
             },

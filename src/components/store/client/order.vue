@@ -13,9 +13,15 @@
                 <el-cascader
                     :options="giveProjects"
                     v-model="formData.selectedGiveProject"
+                    @change="giveCourseOfTreatmentFlag = true"
                     @active-item-change="changeActive">
                 </el-cascader>
             </el-form-item>  
+            <el-form-item label="赠送项目次数" v-if="giveCourseOfTreatmentFlag" prop="giveCourseOfTreatment">
+                <el-col :span="6">
+                    <el-input v-model="formData.giveCourseOfTreatment"></el-input>
+                </el-col>
+            </el-form-item>
             <el-form-item label="卡类型" prop="cardValue">
                 <el-col :span="5">
                     <el-select v-model="cardType">
@@ -86,9 +92,12 @@
                 <el-form-item label="续单项目:" v-if="params.renewProject">
                     <span>{{computedRenewProject}}</span>
                 </el-form-item> 
-                <el-form-item label="赠送项目:" v-if="params.gitveProject">
+                <el-form-item label="赠送项目:" v-if="params.giveProject">
                     <span>{{computedGiveProject}}</span>
-                </el-form-item>                               
+                </el-form-item>
+                <el-form-item label="赠送项目次数:" v-if="giveCourseOfTreatmentFlag">
+                    <span>{{params.giveCourseOfTreatment}}次</span>
+                </el-form-item>                                               
                 <el-form-item label="疗程卡:" v-if="params.courseOfTreatment">
                     <span>{{params.courseOfTreatment}}次</span>
                 </el-form-item>
@@ -134,6 +143,7 @@
                 params: {},
                 isSubmit: false,
                 cardType: 'time',
+                giveCourseOfTreatmentFlag: false,
                 formData: {
                     selectedRenewProject: [],
                     selectedGiveProject: [],
@@ -154,9 +164,24 @@
                     type: "1",
                     technicians: [],
                     technicianId: '',
-                    reason: ''
+                    reason: '',
+                    giveCourseOfTreatment: ''
                 },
                 formDataRules: {
+                    giveCourseOfTreatment: [
+                        {
+                            required: true,
+                            validator: (rule, value, callback) => {
+                                let val = value.trim();
+                                if (val && parseInt(val, 10) == val && val >= 1) {
+                                    callback()
+                                }else {
+                                    callback(new Error('次数应为正整数'))
+                                }
+                            },
+                            trigger: 'blur',
+                        }
+                    ],
                     selectedRenewProject: [
                         {
                             required: true,
@@ -302,6 +327,10 @@
                     params.storeId = this.storeId;
                     params.renewProject = params.selectedRenewProject[1];
                     params.giveProject = params.selectedGiveProject[1];
+                    params.giveCourseOfTreatment = parseInt(params.giveCourseOfTreatment, 10);
+                    if(params.giveProject === undefined) {
+                        delete params.giveCourseOfTreatment
+                    }
                     if(!params.giveCardId) {
                         params.giveCardId = null;
                     }

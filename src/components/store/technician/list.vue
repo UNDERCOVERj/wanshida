@@ -9,38 +9,39 @@
             :data="technicians"
             stripe
             style="width: 100%">
-            <el-table-column
-                align="center"
-                prop="name"
-                label="姓名">
-            </el-table-column>
-            <el-table-column
-                align="center"
-                prop="phoneNumber"
-                label="手机号">
-            </el-table-column>
-            <el-table-column
-                align="center"
-                prop="level"
-                label="职称">
-            </el-table-column>
-            <el-table-column
-                align="center"
-                prop="manualFee"
-                label="本月手工费">
-            </el-table-column>
-            <el-table-column
-                align="center"
-                label="本月开单"
-                prop="totalFee">
-            </el-table-column>
-            <el-table-column
-                align="center"
-                label="操作">
-                <template slot-scope="scope">
-                    <el-button type="text" size="small" @click="goToTechnicianDetails(scope.row)">详情</el-button>
-                </template>
-            </el-table-column>
+                <el-table-column
+                    align="center"
+                    prop="name"
+                    label="姓名">
+                </el-table-column>
+                <el-table-column
+                    align="center"
+                    prop="phoneNumber"
+                    label="手机号">
+                </el-table-column>
+                <el-table-column
+                    align="center"
+                    prop="level"
+                    label="职称">
+                </el-table-column>
+                <el-table-column
+                    align="center"
+                    prop="manualFee"
+                    label="本月手工费">
+                </el-table-column>
+                <el-table-column
+                    align="center"
+                    label="本月开单"
+                    prop="totalFee">
+                </el-table-column>
+                <el-table-column
+                    align="center"
+                    label="操作">
+                    <template slot-scope="scope">
+                        <el-button type="text" size="small" @click="goToTechnicianDetails(scope.row)">详情</el-button>
+                        <el-button type="text" size="small" @click="deleteTechnician(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>          
             </el-table>
             <el-dialog
                 title="添加技师"
@@ -176,6 +177,17 @@
               .then((data) => {
                 this.technicians = data;
               })        
+        },
+        deleteTechnician (detail) {
+            let params = {
+                storeId: this.storeId,
+                technicianId: detail.userId
+            }
+            API.fetch('/api/administration/technicians/delate', params)
+                .then((data) => {
+                    Message('删除成功')
+                    this.getList();
+                })
         }
     },
     watch: {
