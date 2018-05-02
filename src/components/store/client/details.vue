@@ -122,10 +122,25 @@
                     </el-table-column>
                     <el-table-column
                         align="center"
+                        prop="evaluation"
+                        label="星级"
+                    >
+                        <template slot-scope="scope" v-if="scope.row.evaluation != 0">
+                            <span>{{scope.row.evaluation}}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        align="center"
+                        prop="evaluationRemarks"
+                        label="评论"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                        align="center"
                         prop="remarks"
                         label="备注"
                     >  
-                    </el-table-column>                 
+                    </el-table-column>
                 </el-table>
             </div>
             <div class="integral">
